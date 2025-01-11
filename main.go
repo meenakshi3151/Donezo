@@ -1,6 +1,7 @@
 package main
 import (
 	"fmt"
+	"strings"
 )
 
 var countOfDetails int = 0
@@ -9,8 +10,18 @@ func greetUsers() {
 	fmt.Println("Welcome to one stop solution of your tasks")
 }
 
+func verifyEmail(email string) bool {
+	var specialChar = []string{"!", "#", "$", "%", "^", "&", "*", "(", ")", "_", "-", "+", "=", "{", "}", "[", "]", ":", ";", "'", "<", ">", ",", ".", "?", "/", "|", "`", "~"}
+	for _, char := range specialChar {
+		if strings.Contains(email, char) {
+			return false
+		}
+	}
+	return strings.Contains(email, "@gmail.com") 
+}
+
 func verification(firstName string, lastName string, email string) {
-	if len(firstName) > 2 && len(lastName) > 2 && len(email) > 2 {
+	if len(firstName) > 2 && len(lastName) > 2 && verifyEmail(email) {
 		fmt.Println("You are verified")
 	} else {
 		fmt.Println("Please enter a valid name with at least 2 characters.")
@@ -38,7 +49,6 @@ func getUserDetails() {
 	fmt.Println("Email: ", email)
 	verification(firstName, lastName, email)
 }
-
 
 func main() {
 	greetUsers();
