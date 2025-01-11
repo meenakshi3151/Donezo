@@ -34,6 +34,10 @@ func verification(firstName string, lastName string, email string) {
 	}
 }
 
+func checkDuplicateEmail(email string) {
+ 
+}
+
 func getUserDetails() {
 	var firstName string
 	var lastName string
@@ -48,11 +52,11 @@ func getUserDetails() {
 	fmt.Println("Last Name: ", lastName)
 	fmt.Println("Email: ", email)
 	verification(firstName, lastName, email)
+	checkDuplicateEmail(email)
 }
 
 func main() {
-	greetUsers();
-	getUserDetails();
-
-   
+	greetUsers()
+	getUserDetails()
+  
 }
