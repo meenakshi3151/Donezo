@@ -1,4 +1,4 @@
-module main
+module ToDoList
 
 go 1.22.5
 

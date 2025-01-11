@@ -1,7 +1,10 @@
 package main
+
 import (
 	"fmt"
 	"strings"
+	"ToDoList/donezodb"
+	"database/sql"
 )
 
 var countOfDetails int = 0
@@ -17,10 +20,10 @@ func verifyEmail(email string) bool {
 			return false
 		}
 	}
-	return strings.Contains(email, "@gmail.com") 
+	return strings.Contains(email, "@gmail.com")
 }
 
-func verification(firstName string, lastName string, email string) {
+func verification(firstName string, lastName string, email string, db *sql.DB) {
 	if len(firstName) > 2 && len(lastName) > 2 && verifyEmail(email) {
 		fmt.Println("You are verified")
 	} else {
@@ -28,17 +31,22 @@ func verification(firstName string, lastName string, email string) {
 		countOfDetails++
 		if countOfDetails == 2 {
 			fmt.Println("You have reached the limit of entering the details")
-			return 
+			return
 		}
-		getUserDetails()
+		getUserDetails(db)
 	}
 }
 
-func checkDuplicateEmail(email string) {
- 
+func checkDuplicateEmail(db *sql.DB,email string) {
+   if(donezodb.CheckEmail(db, email)) {
+	   
+   } else {
+	   fmt.Println("Email is duplicate. Use another email")
+	   getUserDetails(db)
+   }
 }
 
-func getUserDetails() {
+func getUserDetails(db *sql.DB) {
 	var firstName string
 	var lastName string
 	var email string
@@ -51,12 +59,17 @@ func getUserDetails() {
 	fmt.Println("First Name: ", firstName)
 	fmt.Println("Last Name: ", lastName)
 	fmt.Println("Email: ", email)
-	verification(firstName, lastName, email)
-	checkDuplicateEmail(email)
+	verification(firstName, lastName, email, db)
+	checkDuplicateEmail(db, email)
 }
 
 func main() {
+	db, err := donezodb.Connect()
+	if err != nil {
+		fmt.Println("Failed to connect to the database:", err)
+		return
+	}
+	defer db.Close()
 	greetUsers()
-	getUserDetails()
-  
+	getUserDetails(db) 
 }
