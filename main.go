@@ -9,6 +9,7 @@ import (
 
 var countOfDetails int = 0
 var countOfLogin int = 0
+var tasksExisting [][]string
 
 func greetUsers() {
 	fmt.Println("Welcome to one stop solution of your tasks")
@@ -98,31 +99,49 @@ func loginUser(db *sql.DB) string {
 }
 
 func showTasks(db *sql.DB, email string) {
-	var tasks [][]string
-	donezodb.GetTasksAndStatus(db, &tasks, email)
-	if len(tasks) == 0 {
+	donezodb.GetTasksAndStatus(db, &tasksExisting, email)
+	if len(tasksExisting) == 0 {
 		fmt.Println("No tasks to show")
+		return
 	}
 	fmt.Println("Your tasks along with the status are:")
-	for _, task := range tasks {
-		fmt.Println("Task:", task[0], "Status:", task[1])
+	for _, task := range tasksExisting {
+		fmt.Printf("Task Id: %s, Task Name: %s, Status: %s\n", task[0], task[1], task[2])
 	}
 }
 
 func askForUpdationOfTasks(db *sql.DB, email string ) {
-   
+   var existingTask = len (tasksExisting)
+   var noOfTasksUpdate int 
+   fmt.Print("Enter the number of tasks you want to update out of: ", existingTask)
+   fmt.Scan(&noOfTasksUpdate)
+   for i := 0; i < noOfTasksUpdate; i++ {
+	   fmt.Print("Enter the task id you want to update: ")
+	   var taskId int
+	   fmt.Scan(&taskId)
+	   fmt.Print("Enter the task status: ")
+	   var taskStatus string
+	   fmt.Scan(&taskStatus)
+	   _, err := db.Exec("UPDATE task SET Status = ? WHERE Id = ? AND Email = ?", taskStatus, taskId, email)
+	   if err != nil {
+		   fmt.Println("Error updating the task:", err)
+	   }
+   }
 }
 
 func AddNewTasks(db *sql.DB, email string) {
-   var noOfTasks int
-   fmt.Print("Enter the number of tasks you want to add: ")
-   fmt.Scan(&noOfTasks)
-   var tasks = make([][]string, noOfTasks)
-   for i := 0; i < noOfTasks; i++ {
-	   fmt.Print("Enter the task : ", i+1, ": ")
-	   fmt.Scan(&tasks[i][0])
-	   tasks[i][1] = email
-   }
+	var noOfTasks int
+	fmt.Print("Enter the number of tasks you want to add: ")
+	fmt.Scan(&noOfTasks)
+	var tasks []string
+	for i := 0; i < noOfTasks; i++ {
+		fmt.Printf("Enter the task %d: ", i+1)
+		var taskName string
+		fmt.Scanln(&taskName) 
+		tasks = append(tasks, taskName)
+	}
+	donezodb.InsertTask(db, tasks, email)
+	fmt.Println("Tasks added successfully")
 }
 
 func askChoiceOfUser(db *sql.DB, email string) {

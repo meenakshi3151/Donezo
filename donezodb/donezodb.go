@@ -61,16 +61,31 @@ func LoginUser(db *sql.DB, email string, password string) bool {
 	return true
 }
 
-func GetTasksAndStatus(db *sql.DB, task *[][]string, email string) {
-	err := db.QueryRow("SELECT Name, Status FROM task WHERE Email = ?", email).Scan(&task)
+func GetTasksAndStatus(db *sql.DB, tasks *[][]string, email string) {
+	rows, err := db.Query("SELECT Id, Name, Status FROM task WHERE Email = ?", email)
 	if err != nil {
-		fmt.Print("Not getting tasks and status:", err," ")
+		fmt.Println("Error querying tasks and status:", err)
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id, name, status string
+		err := rows.Scan(&id, &name, &status)
+		if err != nil {
+			fmt.Println("Error scanning row:", err)
+			continue
+		}
+		*tasks = append(*tasks, []string{id, name, status})
+	}
+	if err := rows.Err(); err != nil {
+		fmt.Println("Error during row iteration:", err)
 	}
 }
 
-func InsertTask(db *sql.DB, tasks [][]string) {
+
+func InsertTask(db *sql.DB, tasks []string, email string) {
 	for _, task := range tasks { 
-		_, err := db.Exec("INSERT INTO task (Name, Email) VALUES (?,?)", task)
+		_, err := db.Exec("INSERT INTO task (Name, Email) VALUES (?,?)", task, email)
 		if err!= nil {
 			fmt.Println("Error inserting task:", err)
 		}
