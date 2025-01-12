@@ -27,12 +27,13 @@ func verifyEmail(email string) bool {
 func verification(firstName string, lastName string, email string, password string, db *sql.DB) {
 	if len(firstName) > 2 && len(lastName) > 2 && verifyEmail(email) && len(password) >= 8 {
 		fmt.Println("You are verified")
+		checkDuplicateEmail(db, email, firstName, lastName, password)
 	} else {
 		fmt.Println("Please enter a valid name and email")
 		countOfDetails++
 		if countOfDetails == 2 {
 			fmt.Println("You have reached the limit of entering the details")
-			return
+			return 
 		}
 		getUserDetails(db)
 	}
@@ -63,8 +64,8 @@ func getUserDetails(db *sql.DB) {
 	fmt.Println("First Name: ", firstName)
 	fmt.Println("Last Name: ", lastName)
 	fmt.Println("Email: ", email)
+
 	verification(firstName, lastName, email, password, db)
-	checkDuplicateEmail(db, email, firstName, lastName, password)
 }
 
 func askForExistingUser(db *sql.DB) bool {
@@ -125,13 +126,12 @@ func main() {
 	greetUsers()
 	if askForExistingUser(db) {
 		fmt.Println("Welcome back")
-		loginUser(db)
 	} else {
 		getUserDetails(db)
 	}
+	loginUser(db)
 	fmt.Println("---------------------------------")
 	showTasks(db)
 	askForUpdationOfTasks(db)
 	AddNewTasks(db)
-	return 
 }

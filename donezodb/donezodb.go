@@ -41,7 +41,7 @@ func InsertUser(db *sql.DB, firstName string, lastName string, email string, pas
 	if err != nil {
 		fmt.Println("Error inserting user:", err)
 	} else {
-	fmt.Println("User inserted successfully")
+	fmt.Println("User inserted successfully. ")
 	}
 }
 
@@ -53,7 +53,7 @@ func LoginUser(db *sql.DB, email string, password string) bool {
 		return false
 	}
 	if count > 0 {
-		fmt.Println("User found")
+		fmt.Print("User found. ")
 	} else {
 		fmt.Println("User not found. Provide correct email and password")
 		return false
@@ -64,7 +64,7 @@ func LoginUser(db *sql.DB, email string, password string) bool {
 func GetTasksAndStatus(db *sql.DB, task *[][]string) {
 	err := db.QueryRow("SELECT Name, Status FROM task").Scan(&task)
 	if err != nil {
-		fmt.Println("Error getting tasks and status:", err)
+		fmt.Print("Not getting tasks and status:", err," ")
 	}
 }
 
