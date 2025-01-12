@@ -113,7 +113,7 @@ func showTasks(db *sql.DB, email string) {
 func askForUpdationOfTasks(db *sql.DB, email string ) {
    var existingTask = len (tasksExisting)
    var noOfTasksUpdate int 
-   fmt.Print("Enter the number of tasks you want to update out of: ", existingTask)
+   fmt.Println("Enter the number of tasks you want to update out of: ", existingTask)
    fmt.Scan(&noOfTasksUpdate)
    for i := 0; i < noOfTasksUpdate; i++ {
 	   fmt.Print("Enter the task id you want to update: ")
@@ -161,6 +161,17 @@ func askChoiceOfUser(db *sql.DB, email string) {
 	}
 }
 
+func exit() bool {
+    fmt.Println("Do you want to close the session? (y/n): ")
+	var choice string
+	fmt.Scan(&choice)
+	if choice == "y" {
+	   fmt.Println("I hope you liked our service")
+	   return true
+	}
+	return false 
+}
+
 func main() {
 	db, err := donezodb.Connect()
 	if err != nil {
@@ -178,6 +189,10 @@ func main() {
 	fmt.Println("---------------------------------")
 	showTasks(db, response_email)
 	fmt.Println("---------------------------------")
-	askChoiceOfUser(db, response_email)
-	
+    // ask user infinitely for their choice
+	for {
+		askChoiceOfUser(db, response_email)
+		showTasks(db, response_email)
+		exit()
+	}
 }
