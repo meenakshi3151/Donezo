@@ -47,7 +47,7 @@ func InsertUser(db *sql.DB, firstName string, lastName string, email string, pas
 
 func LoginUser(db *sql.DB, email string, password string) bool {
 	var count int
-	err := db.QueryRow("SELECT COUNT(*) FROM user WHERE email = ? AND password = ?", email, password).Scan(&count)
+	err := db.QueryRow("SELECT COUNT(*) FROM user WHERE Email = ? AND Password = ?", email, password).Scan(&count)
 	if err != nil {
 		fmt.Println("Error checking for user:", err)
 		return false
@@ -61,10 +61,19 @@ func LoginUser(db *sql.DB, email string, password string) bool {
 	return true
 }
 
-func GetTasksAndStatus(db *sql.DB, task *[][]string) {
-	err := db.QueryRow("SELECT Name, Status FROM task").Scan(&task)
+func GetTasksAndStatus(db *sql.DB, task *[][]string, email string) {
+	err := db.QueryRow("SELECT Name, Status FROM task WHERE Email = ?", email).Scan(&task)
 	if err != nil {
 		fmt.Print("Not getting tasks and status:", err," ")
+	}
+}
+
+func InsertTask(db *sql.DB, tasks [][]string) {
+	for _, task := range tasks { 
+		_, err := db.Exec("INSERT INTO task (Name, Email) VALUES (?,?)", task)
+		if err!= nil {
+			fmt.Println("Error inserting task:", err)
+		}
 	}
 }
 

@@ -75,7 +75,7 @@ func askForExistingUser(db *sql.DB) bool {
 	return choice == "y"
 }
 
-func loginUser(db *sql.DB) {
+func loginUser(db *sql.DB) string {
 	var email string
 	var password string
 	fmt.Print("Enter your email address: ")
@@ -84,23 +84,24 @@ func loginUser(db *sql.DB) {
 	fmt.Scan(&password)
 	if donezodb.LoginUser(db, email, password) {
 		fmt.Println("Login successful")
+		return email
 	} else {
 		fmt.Println("Login failed")
 		loginUser(db)
 		countOfLogin++
 		if countOfLogin == 2 {
 			fmt.Println("You have reached the limit of entering the login details")
-			return
+			return ""
 		}
 	}
+	return ""
 }
 
-func showTasks(db *sql.DB) {
+func showTasks(db *sql.DB, email string) {
 	var tasks [][]string
-	donezodb.GetTasksAndStatus(db, &tasks)
+	donezodb.GetTasksAndStatus(db, &tasks, email)
 	if len(tasks) == 0 {
 		fmt.Println("No tasks to show")
-		return
 	}
 	fmt.Println("Your tasks along with the status are:")
 	for _, task := range tasks {
@@ -108,12 +109,37 @@ func showTasks(db *sql.DB) {
 	}
 }
 
-func askForUpdationOfTasks(db *sql.DB) {
-
+func askForUpdationOfTasks(db *sql.DB, email string ) {
+   
 }
 
-func AddNewTasks(db *sql.DB) {
+func AddNewTasks(db *sql.DB, email string) {
+   var noOfTasks int
+   fmt.Print("Enter the number of tasks you want to add: ")
+   fmt.Scan(&noOfTasks)
+   var tasks = make([][]string, noOfTasks)
+   for i := 0; i < noOfTasks; i++ {
+	   fmt.Print("Enter the task : ", i+1, ": ")
+	   fmt.Scan(&tasks[i][0])
+	   tasks[i][1] = email
+   }
+}
 
+func askChoiceOfUser(db *sql.DB, email string) {
+	fmt.Println("Do you want to add new tasks or update the existing tasks?")
+	fmt.Println("1. Add new tasks")
+	fmt.Println("2. Update the existing tasks")
+	var choice int
+	fmt.Scan(&choice)
+	switch choice {
+	case 1:
+		AddNewTasks(db, email)
+	case 2:
+		askForUpdationOfTasks(db, email)
+	default:
+		fmt.Println("Invalid choice")
+		return
+	}
 }
 
 func main() {
@@ -128,10 +154,11 @@ func main() {
 		fmt.Println("Welcome back")
 	} else {
 		getUserDetails(db)
-	}
-	loginUser(db)
+	} 
+	var response_email = loginUser(db)
 	fmt.Println("---------------------------------")
-	showTasks(db)
-	askForUpdationOfTasks(db)
-	AddNewTasks(db)
+	showTasks(db, response_email)
+	fmt.Println("---------------------------------")
+	askChoiceOfUser(db, response_email)
+	
 }
