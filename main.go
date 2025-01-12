@@ -8,6 +8,7 @@ import (
 )
 
 var countOfDetails int = 0
+var countOfLogin int = 0
 
 func greetUsers() {
 	fmt.Println("Welcome to one stop solution of your tasks")
@@ -85,7 +86,33 @@ func loginUser(db *sql.DB) {
 	} else {
 		fmt.Println("Login failed")
 		loginUser(db)
+		countOfLogin++
+		if countOfLogin == 2 {
+			fmt.Println("You have reached the limit of entering the login details")
+			return
+		}
 	}
+}
+
+func showTasks(db *sql.DB) {
+	var tasks [][]string
+	donezodb.GetTasksAndStatus(db, &tasks)
+	if len(tasks) == 0 {
+		fmt.Println("No tasks to show")
+		return
+	}
+	fmt.Println("Your tasks along with the status are:")
+	for _, task := range tasks {
+		fmt.Println("Task:", task[0], "Status:", task[1])
+	}
+}
+
+func askForUpdationOfTasks(db *sql.DB) {
+
+}
+
+func AddNewTasks(db *sql.DB) {
+
 }
 
 func main() {
@@ -102,5 +129,9 @@ func main() {
 	} else {
 		getUserDetails(db)
 	}
-    
+	fmt.Println("---------------------------------")
+	showTasks(db)
+	askForUpdationOfTasks(db)
+	AddNewTasks(db)
+	return 
 }

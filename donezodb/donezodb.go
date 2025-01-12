@@ -60,3 +60,11 @@ func LoginUser(db *sql.DB, email string, password string) bool {
 	}
 	return true
 }
+
+func GetTasksAndStatus(db *sql.DB, task *[][]string) {
+	err := db.QueryRow("SELECT Name, Status FROM task").Scan(&task)
+	if err != nil {
+		fmt.Println("Error getting tasks and status:", err)
+	}
+}
+
