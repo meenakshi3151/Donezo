@@ -83,18 +83,19 @@ func loginUser(db *sql.DB) string {
 	fmt.Scan(&email)
 	fmt.Print("Enter your password: ")
 	fmt.Scan(&password)
-	if donezodb.LoginUser(db, email, password) {
-		fmt.Println("Login successful")
-		return email
-	} else {
-		fmt.Println("Login failed")
-		loginUser(db)
-		countOfLogin++
-		if countOfLogin == 2 {
-			fmt.Println("You have reached the limit of entering the login details")
-			return ""
+	for countOfLogin < 2 {
+		fmt.Print("Enter your email address: ")
+		fmt.Scan(&email)
+		fmt.Print("Enter your password: ")
+		fmt.Scan(&password)
+		if donezodb.LoginUser(db, email, password) {
+			fmt.Println("Login successful")
+			return email
 		}
+		fmt.Println("Login failed")
+		countOfLogin++
 	}
+	fmt.Println("You have reached the limit of entering the login details")
 	return ""
 }
 
@@ -186,13 +187,18 @@ func main() {
 		getUserDetails(db)
 	} 
 	var response_email = loginUser(db)
+	if response_email == "" {
+		fmt.Println("Unable to log in. Exiting...")
+		return
+	}	
 	fmt.Println("---------------------------------")
 	showTasks(db, response_email)
 	fmt.Println("---------------------------------")
-    // ask user infinitely for their choice
 	for {
 		askChoiceOfUser(db, response_email)
 		showTasks(db, response_email)
-		exit()
+		if exit() {
+			break
+		}		
 	}
 }
